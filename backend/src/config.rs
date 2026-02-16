@@ -7,6 +7,13 @@ pub struct AppConfig {
     pub cors_origin: String,
     pub db_max_connections: u32,
     pub environment: String,
+    pub admin_token: Option<String>,
+    pub smtp_host: Option<String>,
+    pub smtp_port: Option<u16>,
+    pub smtp_username: Option<String>,
+    pub smtp_password: Option<String>,
+    pub admin_email: Option<String>,
+    pub app_base_url: String,
 }
 
 impl AppConfig {
@@ -26,6 +33,14 @@ impl AppConfig {
                 .unwrap_or(5),
             environment: std::env::var("ENVIRONMENT")
                 .unwrap_or_else(|_| "development".to_string()),
+            admin_token: std::env::var("ADMIN_TOKEN").ok().filter(|s| !s.is_empty()),
+            smtp_host: std::env::var("SMTP_HOST").ok().filter(|s| !s.is_empty()),
+            smtp_port: std::env::var("SMTP_PORT").ok().and_then(|p| p.parse().ok()),
+            smtp_username: std::env::var("SMTP_USERNAME").ok().filter(|s| !s.is_empty()),
+            smtp_password: std::env::var("SMTP_PASSWORD").ok().filter(|s| !s.is_empty()),
+            admin_email: std::env::var("ADMIN_EMAIL").ok().filter(|s| !s.is_empty()),
+            app_base_url: std::env::var("APP_BASE_URL")
+                .unwrap_or_else(|_| "http://localhost:4200".to_string()),
         })
     }
 

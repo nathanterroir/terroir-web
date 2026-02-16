@@ -1,8 +1,10 @@
 use axum::extract::{Path, Query, State};
+use axum::http::HeaderMap;
 use axum::Json;
 use serde::Deserialize;
+use validator::Validate;
 
-use crate::errors::ApiResult;
+use crate::errors::{ApiError, ApiResult};
 use crate::models::*;
 use crate::services;
 use crate::AppState;
@@ -48,13 +50,50 @@ pub async fn get_post(
     Ok(Json(post))
 }
 
+// ── Anti-Spam ────────────────────────────────
+
+fn check_spam(honeypot: &Option<String>, form_loaded_at: &Option<i64>) -> ApiResult<()> {
+    if let Some(hp) = honeypot {
+        if !hp.is_empty() {
+            tracing::info!("Spam blocked: honeypot field filled");
+            return Err(ApiError::SpamDetected);
+        }
+    }
+    if let Some(loaded_at) = form_loaded_at {
+        let now_ms = chrono::Utc::now().timestamp_millis();
+        let elapsed_ms = now_ms - loaded_at;
+        if elapsed_ms < 2_000 {
+            tracing::info!("Spam blocked: form submitted in {elapsed_ms}ms (too fast)");
+            return Err(ApiError::SpamDetected);
+        }
+    }
+    Ok(())
+}
+
 // ── Contact ───────────────────────────────────
 
 pub async fn submit_contact(
     State(state): State<AppState>,
     Json(req): Json<ContactRequest>,
 ) -> ApiResult<Json<serde_json::Value>> {
-    services::create_contact(&state.db, &req).await?;
+    check_spam(&req.website, &req._form_loaded_at)?;
+    req.validate().map_err(|e| ApiError::Validation(e.to_string()))?;
+
+    let recent = services::count_recent_contacts(&state.db, &req.email, 60).await?;
+    if recent >= 3 {
+        tracing::info!("Rate limited contact from: {}", req.email);
+        return Err(ApiError::RateLimited);
+    }
+
+    let submission = services::create_contact(&state.db, &req).await?;
+
+    let config = state.config.clone();
+    tokio::spawn(async move {
+        if let Err(e) = crate::email::notify_contact(&config, &submission).await {
+            tracing::warn!("Failed to send contact notification email: {e}");
+        }
+    });
+
     Ok(Json(serde_json::json!({
         "success": true,
         "message": "Thank you for reaching out. We'll be in touch shortly."
@@ -67,7 +106,24 @@ pub async fn submit_waitlist(
     State(state): State<AppState>,
     Json(req): Json<WaitlistRequest>,
 ) -> ApiResult<Json<serde_json::Value>> {
-    services::create_waitlist_entry(&state.db, &req).await?;
+    check_spam(&req.website, &req._form_loaded_at)?;
+    req.validate().map_err(|e| ApiError::Validation(e.to_string()))?;
+
+    let recent = services::count_recent_waitlist(&state.db, &req.email, 60).await?;
+    if recent >= 3 {
+        tracing::info!("Rate limited waitlist from: {}", req.email);
+        return Err(ApiError::RateLimited);
+    }
+
+    let entry = services::create_waitlist_entry(&state.db, &req).await?;
+
+    let config = state.config.clone();
+    tokio::spawn(async move {
+        if let Err(e) = crate::email::notify_waitlist(&config, &entry).await {
+            tracing::warn!("Failed to send waitlist notification email: {e}");
+        }
+    });
+
     Ok(Json(serde_json::json!({
         "success": true,
         "message": "You're on the list! We'll reach out when your spot is ready."
@@ -145,4 +201,57 @@ pub async fn create_experiment(
 ) -> ApiResult<Json<Experiment>> {
     let exp = services::create_experiment(&state.db, &req).await?;
     Ok(Json(exp))
+}
+
+// ── Admin ────────────────────────────────────
+
+fn validate_admin_token(state: &AppState, headers: &HeaderMap) -> ApiResult<()> {
+    let Some(expected) = state.config.admin_token.as_deref() else {
+        return Err(ApiError::Unauthorized);
+    };
+
+    if let Some(auth) = headers.get("authorization") {
+        if let Ok(value) = auth.to_str() {
+            if let Some(token) = value.strip_prefix("Bearer ") {
+                if token == expected {
+                    return Ok(());
+                }
+            }
+        }
+    }
+
+    Err(ApiError::Unauthorized)
+}
+
+pub async fn admin_stats(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+) -> ApiResult<Json<AdminStats>> {
+    validate_admin_token(&state, &headers)?;
+    let stats = services::admin_stats(&state.db).await?;
+    Ok(Json(stats))
+}
+
+pub async fn admin_contacts(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Query(params): Query<PaginationParams>,
+) -> ApiResult<Json<Vec<ContactSubmission>>> {
+    validate_admin_token(&state, &headers)?;
+    let limit = params.limit.unwrap_or(100).min(200);
+    let offset = params.offset.unwrap_or(0);
+    let rows = services::list_contacts(&state.db, limit, offset).await?;
+    Ok(Json(rows))
+}
+
+pub async fn admin_waitlist(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Query(params): Query<PaginationParams>,
+) -> ApiResult<Json<Vec<WaitlistEntry>>> {
+    validate_admin_token(&state, &headers)?;
+    let limit = params.limit.unwrap_or(100).min(200);
+    let offset = params.offset.unwrap_or(0);
+    let rows = services::list_waitlist(&state.db, limit, offset).await?;
+    Ok(Json(rows))
 }

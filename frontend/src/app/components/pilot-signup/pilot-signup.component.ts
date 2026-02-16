@@ -55,6 +55,10 @@ import { AnalyticsService } from '@app/services/analytics.service';
                      aria-label="Approximate acreage" />
             </div>
           </div>
+          <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+            <label for="pilot-website">Website</label>
+            <input id="pilot-website" type="text" [(ngModel)]="website" name="website" tabindex="-1" autocomplete="off">
+          </div>
           <button type="submit" class="btn btn-primary btn-full" [disabled]="loading()">
             @if (loading()) { Submitting... } @else { Reserve My Spot }
           </button>
@@ -175,6 +179,8 @@ export class PilotSignupComponent {
   name = '';
   company = '';
   acreage = '';
+  website = '';
+  private formLoadedAt = Date.now();
 
   loading = signal(false);
   submitted = signal(false);
@@ -182,6 +188,7 @@ export class PilotSignupComponent {
   copied = signal(false);
 
   onSubmit() {
+    if (this.loading()) return;
     this.loading.set(true);
     this.error.set('');
 
@@ -190,6 +197,8 @@ export class PilotSignupComponent {
       name: this.name || undefined,
       company: this.company || undefined,
       interest: 'pilot_2026',
+      website: this.website || undefined,
+      _form_loaded_at: this.formLoadedAt,
     }).subscribe({
       next: () => {
         this.loading.set(false);
@@ -199,9 +208,14 @@ export class PilotSignupComponent {
           { acreage: this.acreage || null, company: this.company || null }
         );
       },
-      error: () => {
+      error: (err) => {
         this.loading.set(false);
-        this.error.set('Something went wrong. Please try again.');
+        const msg = err?.error?.error;
+        if (msg?.includes('Too many')) {
+          this.error.set('Too many submissions. Please wait a few minutes and try again.');
+        } else {
+          this.error.set('Something went wrong. Please try again.');
+        }
       },
     });
   }

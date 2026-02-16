@@ -243,6 +243,40 @@
           { "matcher": { "id": "byName", "options": "status" }, "properties": [{ "id": "custom.cellOptions", "value": { "type": "color-text" } }, { "id": "mappings", "value": [{ "options": { "validated": { "color": "green", "text": "✅ Validated" }, "invalidated": { "color": "red", "text": "❌ Invalidated" }, "active": { "color": "blue", "text": "🔬 Active" }, "paused": { "color": "gray", "text": "⏸ Paused" } }, "type": "value" }] }] }
         ]
       }
+    },
+    {
+      "type": "row",
+      "title": "📋 SUBMISSIONS — Contact & Waitlist Detail",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 53 },
+      "collapsed": false
+    },
+    {
+      "type": "table",
+      "title": "All Contact Submissions",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 54 },
+      "targets": [{
+        "rawSql": "SELECT created_at, name, email, company, crop_type, acreage, LEFT(message, 120) as message_preview, source FROM contact_submissions ORDER BY created_at DESC LIMIT 50",
+        "refId": "A", "format": "table"
+      }],
+      "fieldConfig": {
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "email" }, "properties": [{ "id": "links", "value": [{ "title": "Email", "url": "mailto:${__value.text}" }] }] }
+        ]
+      }
+    },
+    {
+      "type": "table",
+      "title": "All Waitlist / Pilot Signups",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 64 },
+      "targets": [{
+        "rawSql": "SELECT created_at, email, name, company, interest FROM waitlist_entries ORDER BY created_at DESC LIMIT 50",
+        "refId": "A", "format": "table"
+      }],
+      "fieldConfig": {
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "email" }, "properties": [{ "id": "links", "value": [{ "title": "Email", "url": "mailto:${__value.text}" }] }] }
+        ]
+      }
     }
   ],
   "refresh": "30s",

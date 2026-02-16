@@ -80,6 +80,80 @@ pub async fn create_waitlist_entry(pool: &PgPool, req: &WaitlistRequest) -> ApiR
     Ok(entry)
 }
 
+// ── Admin ────────────────────────────────────
+
+pub async fn admin_stats(pool: &PgPool) -> ApiResult<AdminStats> {
+    let stats = sqlx::query_as!(
+        AdminStats,
+        r#"
+        SELECT
+            (SELECT COUNT(*) FROM contact_submissions) as "total_contacts!",
+            (SELECT COUNT(*) FROM waitlist_entries) as "total_waitlist!",
+            (SELECT COUNT(*) FROM contact_submissions WHERE created_at >= CURRENT_DATE) as "contacts_today!",
+            (SELECT COUNT(*) FROM waitlist_entries WHERE created_at >= CURRENT_DATE) as "waitlist_today!"
+        "#,
+    )
+    .fetch_one(pool)
+    .await?;
+    Ok(stats)
+}
+
+pub async fn list_contacts(pool: &PgPool, limit: i64, offset: i64) -> ApiResult<Vec<ContactSubmission>> {
+    let rows = sqlx::query_as!(
+        ContactSubmission,
+        r#"SELECT * FROM contact_submissions ORDER BY created_at DESC LIMIT $1 OFFSET $2"#,
+        limit,
+        offset,
+    )
+    .fetch_all(pool)
+    .await?;
+    Ok(rows)
+}
+
+pub async fn list_waitlist(pool: &PgPool, limit: i64, offset: i64) -> ApiResult<Vec<WaitlistEntry>> {
+    let rows = sqlx::query_as!(
+        WaitlistEntry,
+        r#"SELECT * FROM waitlist_entries ORDER BY created_at DESC LIMIT $1 OFFSET $2"#,
+        limit,
+        offset,
+    )
+    .fetch_all(pool)
+    .await?;
+    Ok(rows)
+}
+
+// ── Rate Limiting ────────────────────────────
+
+pub async fn count_recent_contacts(pool: &PgPool, email: &str, minutes: i64) -> ApiResult<i64> {
+    let count = sqlx::query_scalar!(
+        r#"
+        SELECT COUNT(*) as "count!"
+        FROM contact_submissions
+        WHERE email = $1 AND created_at > NOW() - ($2 || ' minutes')::interval
+        "#,
+        email,
+        minutes.to_string(),
+    )
+    .fetch_one(pool)
+    .await?;
+    Ok(count)
+}
+
+pub async fn count_recent_waitlist(pool: &PgPool, email: &str, minutes: i64) -> ApiResult<i64> {
+    let count = sqlx::query_scalar!(
+        r#"
+        SELECT COUNT(*) as "count!"
+        FROM waitlist_entries
+        WHERE email = $1 AND created_at > NOW() - ($2 || ' minutes')::interval
+        "#,
+        email,
+        minutes.to_string(),
+    )
+    .fetch_one(pool)
+    .await?;
+    Ok(count)
+}
+
 // ── Analytics ────────────────────────────────
 
 pub async fn record_page_view(pool: &PgPool, req: &PageViewRequest) -> ApiResult<()> {

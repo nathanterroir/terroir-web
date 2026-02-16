@@ -41,6 +41,10 @@ import { AnalyticsService } from '@app/services/analytics.service';
             <label for="message">Message *</label>
             <textarea id="message" [(ngModel)]="message" name="message" required rows="4" placeholder="Tell us about your operation..."></textarea>
           </div>
+          <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+            <label for="website">Website</label>
+            <input id="website" type="text" [(ngModel)]="website" name="website" tabindex="-1" autocomplete="off">
+          </div>
           <button type="submit" class="btn btn-primary" [disabled]="loading()">
             @if (loading()) { Sending... } @else { Send Message }
           </button>
@@ -116,12 +120,15 @@ export class ContactFormComponent {
   company = '';
   cropType = '';
   message = '';
+  website = '';
+  private formLoadedAt = Date.now();
 
   loading = signal(false);
   submitted = signal(false);
   error = signal('');
 
   onSubmit() {
+    if (this.loading()) return;
     this.loading.set(true);
     this.error.set('');
 
@@ -132,15 +139,22 @@ export class ContactFormComponent {
       crop_type: this.cropType || undefined,
       message: this.message,
       source: 'website_contact',
+      website: this.website || undefined,
+      _form_loaded_at: this.formLoadedAt,
     }).subscribe({
       next: () => {
         this.loading.set(false);
         this.submitted.set(true);
         this.analytics.trackContactSubmit();
       },
-      error: () => {
+      error: (err) => {
         this.loading.set(false);
-        this.error.set('Something went wrong. Please try again.');
+        const msg = err?.error?.error;
+        if (msg?.includes('Too many')) {
+          this.error.set('Too many submissions. Please wait a few minutes and try again.');
+        } else {
+          this.error.set('Something went wrong. Please try again.');
+        }
       },
     });
   }

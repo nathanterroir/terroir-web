@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
+use validator::Validate;
 
 // ── Blog Posts ───────────────────────────────
 
@@ -53,16 +54,28 @@ pub struct ContactSubmission {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Validate)]
 pub struct ContactRequest {
+    #[validate(length(min = 1, max = 200))]
     pub name: String,
+    #[validate(email, length(max = 300))]
     pub email: String,
+    #[validate(length(max = 200))]
     pub company: Option<String>,
+    #[validate(length(max = 50))]
     pub phone: Option<String>,
+    #[validate(length(max = 100))]
     pub acreage: Option<String>,
+    #[validate(length(max = 100))]
     pub crop_type: Option<String>,
+    #[validate(length(min = 1, max = 5000))]
     pub message: String,
+    #[validate(length(max = 100))]
     pub source: Option<String>,
+    #[serde(default)]
+    pub website: Option<String>,
+    #[serde(default)]
+    pub _form_loaded_at: Option<i64>,
 }
 
 // ── Waitlist ─────────────────────────────────
@@ -77,12 +90,30 @@ pub struct WaitlistEntry {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Validate)]
 pub struct WaitlistRequest {
+    #[validate(email, length(max = 300))]
     pub email: String,
+    #[validate(length(max = 200))]
     pub name: Option<String>,
+    #[validate(length(max = 200))]
     pub company: Option<String>,
+    #[validate(length(max = 100))]
     pub interest: Option<String>,
+    #[serde(default)]
+    pub website: Option<String>,
+    #[serde(default)]
+    pub _form_loaded_at: Option<i64>,
+}
+
+// ── Admin ────────────────────────────────────
+
+#[derive(Debug, Serialize)]
+pub struct AdminStats {
+    pub total_contacts: i64,
+    pub total_waitlist: i64,
+    pub contacts_today: i64,
+    pub waitlist_today: i64,
 }
 
 // ── Health ────────────────────────────────────

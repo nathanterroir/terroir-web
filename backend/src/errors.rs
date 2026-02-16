@@ -16,10 +16,31 @@ pub enum ApiError {
 
     #[error("Internal error: {0}")]
     Internal(#[from] anyhow::Error),
+
+    #[error("Unauthorized")]
+    Unauthorized,
+
+    #[error("Spam detected")]
+    SpamDetected,
+
+    #[error("Too many requests")]
+    RateLimited,
 }
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
+        // Spam: return fake 200 so bots don't learn they were caught
+        if matches!(self, ApiError::SpamDetected) {
+            return (
+                StatusCode::OK,
+                Json(json!({
+                    "success": true,
+                    "message": "Thank you! We'll be in touch shortly."
+                })),
+            )
+                .into_response();
+        }
+
         let (status, message) = match &self {
             ApiError::NotFound(msg) => (StatusCode::NOT_FOUND, msg.clone()),
             ApiError::Validation(msg) => (StatusCode::BAD_REQUEST, msg.clone()),
@@ -37,6 +58,12 @@ impl IntoResponse for ApiError {
                     "An internal error occurred".to_string(),
                 )
             }
+            ApiError::Unauthorized => (StatusCode::UNAUTHORIZED, "Unauthorized".to_string()),
+            ApiError::RateLimited => (
+                StatusCode::TOO_MANY_REQUESTS,
+                "Too many submissions. Please try again later.".to_string(),
+            ),
+            ApiError::SpamDetected => unreachable!(),
         };
 
         (status, Json(json!({ "error": message }))).into_response()

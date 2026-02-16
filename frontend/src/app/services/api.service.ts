@@ -32,6 +32,8 @@ export interface ContactRequest {
   crop_type?: string;
   message: string;
   source?: string;
+  website?: string;
+  _form_loaded_at?: number;
 }
 
 export interface WaitlistRequest {
@@ -39,11 +41,42 @@ export interface WaitlistRequest {
   name?: string;
   company?: string;
   interest?: string;
+  website?: string;
+  _form_loaded_at?: number;
 }
 
 export interface ApiResponse {
   success: boolean;
   message: string;
+}
+
+export interface AdminStats {
+  total_contacts: number;
+  total_waitlist: number;
+  contacts_today: number;
+  waitlist_today: number;
+}
+
+export interface ContactSubmission {
+  id: string;
+  name: string;
+  email: string;
+  company: string | null;
+  phone: string | null;
+  acreage: string | null;
+  crop_type: string | null;
+  message: string;
+  source: string;
+  created_at: string;
+}
+
+export interface WaitlistEntry {
+  id: string;
+  email: string;
+  name: string | null;
+  company: string | null;
+  interest: string;
+  created_at: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -67,5 +100,25 @@ export class ApiService {
 
   joinWaitlist(data: WaitlistRequest): Observable<ApiResponse> {
     return this.http.post<ApiResponse>(`${this.baseUrl}/waitlist`, data);
+  }
+
+  getAdminStats(token: string): Observable<AdminStats> {
+    return this.http.get<AdminStats>(`${this.baseUrl}/admin/stats`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  getAdminContacts(token: string, limit = 100, offset = 0): Observable<ContactSubmission[]> {
+    return this.http.get<ContactSubmission[]>(
+      `${this.baseUrl}/admin/contacts?limit=${limit}&offset=${offset}`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+  }
+
+  getAdminWaitlist(token: string, limit = 100, offset = 0): Observable<WaitlistEntry[]> {
+    return this.http.get<WaitlistEntry[]>(
+      `${this.baseUrl}/admin/waitlist?limit=${limit}&offset=${offset}`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
   }
 }

@@ -8,11 +8,13 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use tower_http::compression::CompressionLayer;
 use tower_http::cors::{Any, CorsLayer};
+use tower_http::limit::RequestBodyLimitLayer;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod api;
 mod config;
+mod email;
 mod errors;
 mod models;
 mod services;
@@ -73,6 +75,7 @@ async fn main() -> Result<()> {
         .layer(cors)
         .layer(TraceLayer::new_for_http())
         .layer(CompressionLayer::new())
+        .layer(RequestBodyLimitLayer::new(64 * 1024)) // 64 KB max request body
         .with_state(state);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port));

@@ -9,6 +9,9 @@ export const serverRoutes: ServerRoute[] = [
   // Blog posts rendered on server per-request (SSR) for dynamic content
   { path: 'blog/:slug', renderMode: RenderMode.Server },
 
+  // Admin: client-side only (noindex, requires auth)
+  { path: 'admin', renderMode: RenderMode.Client },
+
   // Catch-all: client-side render
   { path: '**', renderMode: RenderMode.Client },
 ];

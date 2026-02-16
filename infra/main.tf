@@ -47,6 +47,17 @@ variable "grafana_admin_password" {
   default   = "changeme"
 }
 
+variable "admin_token" {
+  type      = string
+  sensitive = true
+}
+
+variable "smtp_password" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
 variable "billing_account_id" {
   type        = string
   description = "Billing account ID for budget alerts (format: XXXXXX-XXXXXX-XXXXXX). Leave empty to skip."
@@ -194,6 +205,32 @@ resource "google_secret_manager_secret_version" "db_password" {
   secret_data = var.db_password
 }
 
+resource "google_secret_manager_secret" "admin_token" {
+  secret_id = "admin-token"
+  replication {
+    auto {}
+  }
+  depends_on = [google_project_service.apis]
+}
+
+resource "google_secret_manager_secret_version" "admin_token" {
+  secret      = google_secret_manager_secret.admin_token.id
+  secret_data = var.admin_token
+}
+
+resource "google_secret_manager_secret" "smtp_password" {
+  secret_id = "smtp-password"
+  replication {
+    auto {}
+  }
+  depends_on = [google_project_service.apis]
+}
+
+resource "google_secret_manager_secret_version" "smtp_password" {
+  secret      = google_secret_manager_secret.smtp_password.id
+  secret_data = var.smtp_password
+}
+
 # ─── Cloud Run — Backend ────────────────────────
 # COST: Free tier covers 2M requests/mo, 360K vCPU-sec, 180K GiB-sec.
 # Rust API responds in <50ms — free tier supports ~7.2M requests/mo at that latency.
@@ -224,6 +261,44 @@ resource "google_cloud_run_v2_service" "backend" {
         value_source {
           secret_key_ref {
             secret  = google_secret_manager_secret.db_url.secret_id
+            version = "latest"
+          }
+        }
+      }
+      env {
+        name = "ADMIN_TOKEN"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.admin_token.secret_id
+            version = "latest"
+          }
+        }
+      }
+      env {
+        name  = "APP_BASE_URL"
+        value = "https://${var.domain}"
+      }
+      env {
+        name  = "SMTP_HOST"
+        value = "smtp.gmail.com"
+      }
+      env {
+        name  = "SMTP_PORT"
+        value = "587"
+      }
+      env {
+        name  = "SMTP_USERNAME"
+        value = "support@terroirai.com"
+      }
+      env {
+        name  = "ADMIN_EMAIL"
+        value = "support@terroirai.com"
+      }
+      env {
+        name = "SMTP_PASSWORD"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.smtp_password.secret_id
             version = "latest"
           }
         }
@@ -267,7 +342,12 @@ resource "google_cloud_run_v2_service" "backend" {
     timeout = "30s" # Kill slow requests to prevent billing runaway
   }
 
-  depends_on = [google_project_service.apis, google_secret_manager_secret_version.db_url]
+  depends_on = [
+    google_project_service.apis,
+    google_secret_manager_secret_version.db_url,
+    google_secret_manager_secret_version.admin_token,
+    google_secret_manager_secret_version.smtp_password,
+  ]
 }
 
 # ─── Cloud Run — Frontend ───────────────────────

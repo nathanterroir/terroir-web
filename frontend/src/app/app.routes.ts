@@ -21,5 +21,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/contact/contact.component').then((m) => m.ContactComponent),
   },
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('./pages/admin/admin.component').then((m) => m.AdminComponent),
+  },
   { path: '**', redirectTo: '' },
 ];

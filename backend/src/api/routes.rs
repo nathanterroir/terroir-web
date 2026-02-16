@@ -16,4 +16,8 @@ pub fn api_router() -> Router<AppState> {
         .route("/analytics/event", post(handlers::track_event))
         // Experiments (Lean Startup)
         .route("/experiments", get(handlers::list_experiments).post(handlers::create_experiment))
+        // Admin
+        .route("/admin/stats", get(handlers::admin_stats))
+        .route("/admin/contacts", get(handlers::admin_contacts))
+        .route("/admin/waitlist", get(handlers::admin_waitlist))
 }
