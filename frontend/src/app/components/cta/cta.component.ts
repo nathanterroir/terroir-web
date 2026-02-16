@@ -11,11 +11,12 @@ import { AnalyticsService } from '@app/services/analytics.service';
       <div class="container">
         <div class="cta-card">
           <div class="cta-content">
-            <h2>Ready to see your orchard in high definition?</h2>
-            <p>Start your free trial of the Field Fitness Tracker today.</p>
+            <span class="limited-badge">Limited Availability</span>
+            <h2>2026 Pilot Program — 20 Farms Only</h2>
+            <p>Free early access to Precision Labor Intelligence. No commitment required.</p>
             <div class="cta-actions">
-              <a href="#" class="btn btn-white" (click)="onDownload($event)">Download for iOS</a>
-              <a routerLink="/contact" class="btn btn-ghost" (click)="onContact()">Contact Sales</a>
+              <button class="btn btn-white" (click)="onReserveSpot()">Reserve Your Spot</button>
+              <a routerLink="/contact" class="btn btn-ghost" (click)="onContact()">Questions? Talk to Us</a>
             </div>
           </div>
         </div>
@@ -40,6 +41,19 @@ import { AnalyticsService } from '@app/services/analytics.service';
       margin-bottom: 2rem;
       font-size: 1rem;
     }
+    .limited-badge {
+      display: inline-block;
+      padding: 0.3rem 1rem;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 9999px;
+      color: var(--brand-200);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 1rem;
+    }
     .cta-actions {
       display: flex;
       gap: 1rem;
@@ -51,12 +65,12 @@ import { AnalyticsService } from '@app/services/analytics.service';
 export class CtaComponent {
   private readonly analytics = inject(AnalyticsService);
 
-  onDownload(e: Event): void {
-    e.preventDefault();
-    this.analytics.trackDownloadClick();
+  onReserveSpot(): void {
+    this.analytics.trackCtaClick('cta_reserve_spot');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   onContact(): void {
-    this.analytics.trackCtaClick('cta_contact_sales');
+    this.analytics.trackCtaClick('cta_questions');
   }
 }

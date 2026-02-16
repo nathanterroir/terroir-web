@@ -12,7 +12,7 @@ import { DatePipe } from '@angular/common';
     <section class="blog-hero" aria-label="Blog header">
       <div class="container">
         <h1>Blog</h1>
-        <p>Insights on precision agriculture, labor optimization, and field intelligence.</p>
+        <p>Insights on labor optimization, precision crew deployment, and field intelligence for specialty crops.</p>
       </div>
     </section>
 

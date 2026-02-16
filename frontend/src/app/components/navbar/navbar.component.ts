@@ -1,5 +1,6 @@
-import { Component, signal, HostListener } from '@angular/core';
+import { Component, signal, inject, HostListener } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AnalyticsService } from '@app/services/analytics.service';
 
 @Component({
   selector: 'app-navbar',
@@ -21,7 +22,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
           <a routerLink="/contact" routerLinkActive="active">Contact</a>
         </div>
 
-        <a routerLink="/contact" class="btn btn-primary nav-cta">Get Started</a>
+        <a routerLink="/" fragment="pilot-signup" class="btn btn-primary nav-cta" (click)="onPilotCta()">Join the Pilot</a>
 
         <button class="mobile-toggle" (click)="mobileOpen.set(!mobileOpen())" [attr.aria-expanded]="mobileOpen()" aria-label="Toggle mobile menu">
           <span></span><span></span><span></span>
@@ -33,7 +34,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
           <a routerLink="/" (click)="mobileOpen.set(false)">Home</a>
           <a routerLink="/blog" (click)="mobileOpen.set(false)">Blog</a>
           <a routerLink="/contact" (click)="mobileOpen.set(false)">Contact</a>
-          <a routerLink="/contact" class="btn btn-primary" (click)="mobileOpen.set(false)">Get Started</a>
+          <a routerLink="/" fragment="pilot-signup" class="btn btn-primary" (click)="onPilotCta(); mobileOpen.set(false)">Join the Pilot</a>
         </div>
       }
     </nav>
@@ -128,11 +129,16 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   `],
 })
 export class NavbarComponent {
+  private readonly analytics = inject(AnalyticsService);
   scrolled = signal(false);
   mobileOpen = signal(false);
 
   @HostListener('window:scroll')
   onScroll() {
     this.scrolled.set(window.scrollY > 10);
+  }
+
+  onPilotCta(): void {
+    this.analytics.trackCtaClick('nav_pilot_cta');
   }
 }

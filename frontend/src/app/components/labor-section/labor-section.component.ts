@@ -21,10 +21,21 @@ import { Component } from '@angular/core';
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
             </div>
             <h3>Directed Scouting</h3>
-            <p>Our app creates heatmaps of stress and disease. Send scouts directly to hotspots instead of walking every row.</p>
+            <p>AI heatmaps pinpoint disease hotspots and pest pressure so scouts and spray crews hit only the blocks that need them — cutting scouting hours and chemical spend in half.</p>
             <div class="metric">
               <span class="metric-value">50%</span>
               <span class="metric-label">fewer scouting hours</span>
+            </div>
+          </div>
+          <div class="labor-card">
+            <div class="card-icon variable-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <h3>Variable Rate Labor</h3>
+            <p>Deploy different crew sizes per block based on actual plant-level data — not gut feel. Send 8 workers where the crop load is heavy, 3 where it's light.</p>
+            <div class="metric">
+              <span class="metric-value">30%</span>
+              <span class="metric-label">labor cost reduction</span>
             </div>
           </div>
           <div class="labor-card">
@@ -32,10 +43,21 @@ import { Component } from '@angular/core';
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="6" width="22" height="12" rx="2"/><path d="M1 10h22"/></svg>
             </div>
             <h3>Precision Logistics</h3>
-            <p>Map yield variation and estimate cluster size across blocks. Know exactly how many bins and pickers each section needs.</p>
+            <p>Map yield variation and estimate fruit size across every block. Know exactly how many bins, tractors, and pickers each section needs — down to the row.</p>
             <div class="metric">
               <span class="metric-value">Zero</span>
               <span class="metric-label">over-hires at harvest</span>
+            </div>
+          </div>
+          <div class="labor-card">
+            <div class="card-icon harvest-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
+            <h3>Harvest Labor Planning</h3>
+            <p>Right-size your H-2A crews weeks in advance with yield forecasts grounded in actual fruit counts — not last year's averages.</p>
+            <div class="metric">
+              <span class="metric-value">Weeks</span>
+              <span class="metric-label">of advance crew planning</span>
             </div>
           </div>
         </div>
@@ -72,9 +94,9 @@ import { Component } from '@angular/core';
     }
     .labor-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 2rem;
-      max-width: 800px;
+      max-width: 1000px;
       margin: 0 auto;
     }
     .labor-card {
@@ -105,9 +127,17 @@ import { Component } from '@angular/core';
       background: var(--brand-100);
       color: var(--brand-700);
     }
+    .variable-icon {
+      background: #fef3c7;
+      color: #b45309;
+    }
     .logistics-icon {
       background: #dbeafe;
       color: #1d4ed8;
+    }
+    .harvest-icon {
+      background: #ede9fe;
+      color: #6d28d9;
     }
     .labor-card h3 {
       font-size: 1.2rem;

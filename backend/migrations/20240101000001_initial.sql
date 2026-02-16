@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS blog_posts (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_blog_posts_slug ON blog_posts(slug);
-CREATE INDEX idx_blog_posts_published ON blog_posts(published, published_at DESC);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON blog_posts(slug);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_published ON blog_posts(published, published_at DESC);
 
 CREATE TABLE IF NOT EXISTS contact_submissions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS contact_submissions (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_contact_email ON contact_submissions(email);
+CREATE INDEX IF NOT EXISTS idx_contact_email ON contact_submissions(email);
 
 CREATE TABLE IF NOT EXISTS waitlist_entries (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS waitlist_entries (
     UNIQUE(email, interest)
 );
 
-CREATE INDEX idx_waitlist_email ON waitlist_entries(email);
+CREATE INDEX IF NOT EXISTS idx_waitlist_email ON waitlist_entries(email);
 
 -- Seed blog post
 INSERT INTO blog_posts (slug, title, subtitle, category, hero_image_url, content_html, excerpt, author_name, read_time_minutes, published, published_at)

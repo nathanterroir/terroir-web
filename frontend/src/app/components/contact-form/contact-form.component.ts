@@ -34,7 +34,7 @@ import { AnalyticsService } from '@app/services/analytics.service';
             </div>
             <div class="field">
               <label for="crop">Crop Type</label>
-              <input id="crop" type="text" [(ngModel)]="cropType" name="crop" placeholder="e.g., Wine Grapes, Avocados">
+              <input id="crop" type="text" [(ngModel)]="cropType" name="crop" placeholder="e.g., Citrus, Avocados, Grapes">
             </div>
           </div>
           <div class="field">

@@ -10,14 +10,14 @@ import { SeoService } from '@app/services/seo.service';
     <section class="contact-hero" aria-label="Contact header">
       <div class="container">
         <h1>Get In Touch</h1>
-        <p>Whether you manage 50 acres or 5,000 — we'd love to show you what's possible.</p>
+        <p>Whether you manage 50 acres or 5,000 — we'd love to show you what precision labor intelligence can do.</p>
       </div>
     </section>
     <section class="section" aria-label="Contact form">
       <div class="container contact-layout">
         <div class="contact-info">
           <h2>Let's talk about your operation</h2>
-          <p>Tell us about your crops, acreage, and biggest challenges. We'll show you how field intelligence can help.</p>
+          <p>Tell us about your crops, acreage, and biggest challenges. We'll show you how precision labor intelligence can help.</p>
           <address class="info-items">
             <div class="info-item">
               <span class="info-label">Email</span>
@@ -52,8 +52,8 @@ export class ContactComponent implements OnInit {
 
   ngOnInit() {
     this.seo.updateSeo({
-      title: 'Contact Us — Start Your Free Trial',
-      description: 'Get in touch with Terroir AI. Schedule a demo, start a free trial, or learn how field intelligence can optimize labor and yield for your specialty crop operation.',
+      title: 'Contact Us — See a Demo',
+      description: 'Get in touch with Terroir AI. Schedule a demo or learn how precision labor intelligence can optimize crew deployment and reduce costs for your specialty crop operation.',
       url: '/contact',
     });
   }

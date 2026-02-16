@@ -4,12 +4,12 @@ import { Component } from '@angular/core';
   selector: 'app-features',
   standalone: true,
   template: `
-    <section class="section features">
+    <section id="how-it-works" class="section features">
       <div class="container">
         <div class="section-header">
           <span class="eyebrow">How It Works</span>
-          <h2>Mount. Drive. Decide.</h2>
-          <p>Three steps from raw field to actionable intelligence — no drones, no satellites, no waiting.</p>
+          <h2>Mount. Drive. Deploy.</h2>
+          <p>Three steps from raw field to labor deployment plan — no drones, no satellites, no waiting.</p>
         </div>
 
         <div class="feature-grid stagger">
@@ -21,12 +21,12 @@ import { Component } from '@angular/core';
           <div class="feature-card">
             <div class="feature-num">02</div>
             <h3>Drive Your Rows</h3>
-            <p>The app captures 30+ frames per second, applying real-time segmentation masks to every cluster it sees. GPS tags each frame automatically.</p>
+            <p>The app captures 30+ frames per second, applying real-time segmentation masks to every fruit it sees. GPS tags each frame automatically.</p>
           </div>
           <div class="feature-card">
             <div class="feature-num">03</div>
-            <h3>Act On Intelligence</h3>
-            <p>View yield variation heatmaps, disease pressure maps, and labor deployment plans — all before you leave the field.</p>
+            <h3>Deploy With Precision</h3>
+            <p>Get labor plans, crew routing, and cost projections for every block — all before you leave the field.</p>
           </div>
         </div>
       </div>

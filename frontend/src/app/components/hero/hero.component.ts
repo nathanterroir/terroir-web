@@ -1,16 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { PilotSignupComponent } from '@app/components/pilot-signup/pilot-signup.component';
+import { AnalyticsService } from '@app/services/analytics.service';
 
 @Component({
   selector: 'app-hero',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, PilotSignupComponent],
   template: `
     <section class="hero">
       <div class="hero-bg">
         <img
           src="https://images.unsplash.com/photo-1533038590840-1cde6e668a91?q=80&w=2000&auto=format&fit=crop"
-          alt="Sunlit vineyard rows stretching to the horizon — precision agriculture by Terroir AI"
+          alt="Sunlit crop rows stretching to the horizon — precision agriculture by Terroir AI"
           loading="eager"
           fetchpriority="high"
           width="2000"
@@ -20,21 +22,29 @@ import { RouterLink } from '@angular/router';
       </div>
 
       <div class="hero-content container">
-        <span class="badge">The Field Fitness Tracker</span>
-        <h1>See every vine.<br/>Save every dollar.</h1>
+        <span class="badge">Precision Labor Intelligence</span>
+        <h1>Right crew. Right block.<br/>Right time.</h1>
         <p class="subtitle">
-          iPhone-based computer vision that maps yield variation, detects disease,
-          and optimizes labor deployment — in real time, as you drive.
+          iPhone-based computer vision that turns a single drive through your rows
+          into a labor deployment plan — crew sizes, spray priorities, harvest logistics — before you leave the field.
         </p>
         <div class="hero-actions">
-          <a routerLink="/contact" class="btn btn-white">Start Free Trial</a>
-          <a routerLink="/blog" class="btn btn-ghost">Read Our Research</a>
+          <button class="btn btn-white" (click)="onPilotCta()">Apply for the 2026 Pilot</button>
+          <a routerLink="/" fragment="how-it-works" class="btn btn-ghost">See How It Works</a>
         </div>
         <div class="trust-bar">
-          <span>Trusted by growers managing</span>
-          <strong>50,000+ acres</strong>
-          <span>of specialty crops</span>
+          <span>On-device AI</span>
+          <strong>&bull;</strong>
+          <span>No cloud uploads</span>
+          <strong>&bull;</strong>
+          <span>Works offline</span>
+          <strong>&bull;</strong>
+          <span>Sub-inch GPS</span>
         </div>
+
+        @if (showForm()) {
+          <app-pilot-signup />
+        }
       </div>
     </section>
   `,
@@ -123,4 +133,17 @@ import { RouterLink } from '@angular/router';
     }
   `],
 })
-export class HeroComponent {}
+export class HeroComponent {
+  private readonly analytics = inject(AnalyticsService);
+  showForm = signal(false);
+
+  onPilotCta(): void {
+    this.analytics.trackCtaClick('hero_pilot_cta');
+    this.showForm.set(true);
+    setTimeout(() => {
+      document.getElementById('pilot-signup')?.scrollIntoView({
+        behavior: 'smooth', block: 'center'
+      });
+    }, 50);
+  }
+}

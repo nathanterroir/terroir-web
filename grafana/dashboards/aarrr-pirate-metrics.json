@@ -180,14 +180,60 @@
     },
     {
       "type": "row",
-      "title": "🧪 EXPERIMENTS — Lean Startup Hypotheses",
+      "title": "🚀 PILOT CAMPAIGN — 2026 Precision Labor Intelligence",
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 },
+      "collapsed": false
+    },
+    {
+      "type": "stat",
+      "title": "Pilot Signups (All Time)",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 32 },
+      "targets": [{
+        "rawSql": "SELECT COUNT(*) FROM waitlist_entries WHERE interest = 'pilot_2026'",
+        "refId": "A", "format": "table"
+      }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "steps": [{"color": "orange", "value": null}, {"color": "yellow", "value": 5}, {"color": "green", "value": 10}] } } }
+    },
+    {
+      "type": "gauge",
+      "title": "Pilot Signup Rate %",
+      "description": "Pilot signups / unique homepage visitors × 100. Target: ≥3%",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 32 },
+      "targets": [{
+        "rawSql": "SELECT ROUND(COALESCE(COUNT(w.*)::numeric / NULLIF((SELECT COUNT(DISTINCT visitor_id) FROM analytics_page_views WHERE path = '/' AND created_at >= $__timeFrom()), 0) * 100, 0), 2) FROM waitlist_entries w WHERE w.interest = 'pilot_2026' AND w.created_at >= $__timeFrom()",
+        "refId": "A", "format": "table"
+      }],
+      "fieldConfig": { "defaults": { "min": 0, "max": 10, "thresholds": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 1.5}, {"color": "green", "value": 3}] } } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Pilot Funnel — Daily: Visitors → CTA Clicks → Signups",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
+      "targets": [{
+        "rawSql": "SELECT d.day as time, COALESCE(v.visitors, 0) as homepage_visitors, COALESCE(c.cta_clicks, 0) as pilot_cta_clicks, COALESCE(s.signups, 0) as pilot_signups FROM generate_series($__timeFrom()::date, $__timeTo()::date, '1 day') d(day) LEFT JOIN (SELECT DATE(created_at) as day, COUNT(DISTINCT visitor_id) as visitors FROM analytics_page_views WHERE path = '/' GROUP BY DATE(created_at)) v ON d.day = v.day LEFT JOIN (SELECT DATE(created_at) as day, COUNT(*) as cta_clicks FROM analytics_events WHERE event_name = 'cta_click' AND event_label IN ('hero_pilot_cta', 'cta_reserve_spot', 'nav_pilot_cta') GROUP BY DATE(created_at)) c ON d.day = c.day LEFT JOIN (SELECT DATE(created_at) as day, COUNT(*) as signups FROM waitlist_entries WHERE interest = 'pilot_2026' GROUP BY DATE(created_at)) s ON d.day = s.day ORDER BY d.day",
+        "refId": "A", "format": "table"
+      }],
+      "fieldConfig": { "defaults": { "custom": { "fillOpacity": 10 } } }
+    },
+    {
+      "type": "table",
+      "title": "Recent Pilot Signups",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 36 },
+      "targets": [{
+        "rawSql": "SELECT email, name, company, created_at FROM waitlist_entries WHERE interest = 'pilot_2026' ORDER BY created_at DESC LIMIT 20",
+        "refId": "A", "format": "table"
+      }]
+    },
+    {
+      "type": "row",
+      "title": "🧪 EXPERIMENTS — Lean Startup Hypotheses",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 44 },
       "collapsed": false
     },
     {
       "type": "table",
       "title": "Active Experiments",
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 32 },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 45 },
       "targets": [{
         "rawSql": "SELECT name, hypothesis, metric_name, baseline_value, target_value, current_value, status, started_at, CASE WHEN target_value IS NOT NULL AND current_value IS NOT NULL AND target_value != 0 THEN ROUND(current_value / target_value * 100, 1) ELSE NULL END as progress_pct FROM experiments ORDER BY CASE status WHEN 'active' THEN 0 WHEN 'validated' THEN 1 WHEN 'invalidated' THEN 2 ELSE 3 END, started_at DESC",
         "refId": "A", "format": "table"

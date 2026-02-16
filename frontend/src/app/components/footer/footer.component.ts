@@ -14,13 +14,13 @@ import { RouterLink } from '@angular/router';
             <span>Terroir<span class="accent">AI</span></span>
           </div>
           <p>Empowering specialty crop farmers with real-time computer vision and data-driven insights.</p>
-          <p class="tagline"><em>The Field Fitness Tracker.</em></p>
+          <p class="tagline"><em>Precision Labor Intelligence.</em></p>
         </div>
         <div class="footer-links">
           <h4>Product</h4>
-          <a href="#">Yield Monitoring</a>
-          <a href="#">Disease ID</a>
-          <a href="#">LiDAR Mapping</a>
+          <a href="#">Directed Scouting</a>
+          <a href="#">Labor Planning</a>
+          <a href="#">Harvest Analytics</a>
           <a href="#">Pricing</a>
         </div>
         <div class="footer-links">
@@ -32,7 +32,7 @@ import { RouterLink } from '@angular/router';
         </div>
       </div>
       <div class="container footer-bottom">
-        <span>&copy; 2025 Terroir AI. All rights reserved.</span>
+        <span>&copy; 2026 Terroir AI. All rights reserved.</span>
       </div>
     </footer>
   `,

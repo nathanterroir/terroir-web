@@ -107,7 +107,7 @@ export class SeoService {
             '@type': 'ImageObject',
             'url': `${this.baseUrl}/assets/logo.svg`,
           },
-          'description': 'Real-time iPhone-based computer vision for specialty crop intelligence. Optimize labor, forecast yield, and manage disease.',
+          'description': 'Precision Labor Intelligence for specialty crop farmers. iPhone-based computer vision that turns a single drive through your rows into crew deployment plans, spray priorities, and harvest logistics.',
           'sameAs': [],
           'contactPoint': {
             '@type': 'ContactPoint',
@@ -117,10 +117,10 @@ export class SeoService {
         },
         {
           '@type': 'SoftwareApplication',
-          'name': 'Terroir AI Field Fitness Tracker',
+          'name': 'Terroir AI — Precision Labor Intelligence',
           'operatingSystem': 'iOS',
           'applicationCategory': 'BusinessApplication',
-          'description': 'iPhone-based computer vision that maps yield variation, detects disease, and optimizes labor deployment for specialty crop farmers.',
+          'description': 'iPhone-based computer vision that turns field drives into labor deployment plans — directed scouting, variable crew sizing, spray priorities, and harvest logistics for specialty crop farmers.',
           'offers': {
             '@type': 'Offer',
             'price': '0',

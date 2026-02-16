@@ -27,11 +27,11 @@ CREATE TABLE IF NOT EXISTS analytics_page_views (
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_pv_created_at ON analytics_page_views(created_at DESC);
-CREATE INDEX idx_pv_session ON analytics_page_views(session_id);
-CREATE INDEX idx_pv_visitor ON analytics_page_views(visitor_id);
-CREATE INDEX idx_pv_path ON analytics_page_views(path);
-CREATE INDEX idx_pv_utm_source ON analytics_page_views(utm_source) WHERE utm_source IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_pv_created_at ON analytics_page_views(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_pv_session ON analytics_page_views(session_id);
+CREATE INDEX IF NOT EXISTS idx_pv_visitor ON analytics_page_views(visitor_id);
+CREATE INDEX IF NOT EXISTS idx_pv_path ON analytics_page_views(path);
+CREATE INDEX IF NOT EXISTS idx_pv_utm_source ON analytics_page_views(utm_source) WHERE utm_source IS NOT NULL;
 
 -- ── Funnel Events (Activation / Retention / Referral / Revenue) ──
 
@@ -48,11 +48,11 @@ CREATE TABLE IF NOT EXISTS analytics_events (
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_events_created_at ON analytics_events(created_at DESC);
-CREATE INDEX idx_events_name ON analytics_events(event_name);
-CREATE INDEX idx_events_category ON analytics_events(event_category);
-CREATE INDEX idx_events_visitor ON analytics_events(visitor_id);
-CREATE INDEX idx_events_session ON analytics_events(session_id);
+CREATE INDEX IF NOT EXISTS idx_events_created_at ON analytics_events(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_events_name ON analytics_events(event_name);
+CREATE INDEX IF NOT EXISTS idx_events_category ON analytics_events(event_category);
+CREATE INDEX IF NOT EXISTS idx_events_visitor ON analytics_events(visitor_id);
+CREATE INDEX IF NOT EXISTS idx_events_session ON analytics_events(session_id);
 
 -- ── Experiments (Lean Startup hypothesis tracking) ──────────
 
