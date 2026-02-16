@@ -1,0 +1,13 @@
+# Copy this to terraform.tfvars and fill in values
+#
+# Estimated monthly cost: ~$9-15/mo
+# See docs/COST_AUDIT.md for full breakdown
+
+project_id             = "terroirai"
+region                 = "us-central1"  # Cheapest US region for Cloud SQL
+domain                 = "terroirai.com"
+db_password            = "CHANGE_ME_TO_A_STRONG_PASSWORD"
+grafana_admin_password = "CHANGE_ME_GRAFANA_ADMIN"
+
+# Optional: Enable budget alerts (find your billing account ID in GCP Console → Billing)
+# billing_account_id = "XXXXXX-XXXXXX-XXXXXX"

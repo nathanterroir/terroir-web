@@ -1,0 +1,212 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "type": "row",
+      "title": "🏴‍☠️ ACQUISITION — How do users find us?",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false
+    },
+    {
+      "type": "stat",
+      "title": "Visitors (Today)",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "targets": [{
+        "rawSql": "SELECT COUNT(DISTINCT visitor_id) FROM analytics_page_views WHERE created_at >= CURRENT_DATE",
+        "refId": "A", "format": "table"
+      }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "steps": [{"color": "blue", "value": null}, {"color": "green", "value": 10}] } } }
+    },
+    {
+      "type": "stat",
+      "title": "Sessions (Today)",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "targets": [{
+        "rawSql": "SELECT COUNT(DISTINCT session_id) FROM analytics_page_views WHERE created_at >= CURRENT_DATE",
+        "refId": "A", "format": "table"
+      }]
+    },
+    {
+      "type": "stat",
+      "title": "Page Views (Today)",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "targets": [{
+        "rawSql": "SELECT COUNT(*) FROM analytics_page_views WHERE created_at >= CURRENT_DATE",
+        "refId": "A", "format": "table"
+      }]
+    },
+    {
+      "type": "stat",
+      "title": "Pages/Session",
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "targets": [{
+        "rawSql": "SELECT ROUND(COUNT(*)::numeric / NULLIF(COUNT(DISTINCT session_id), 0), 1) FROM analytics_page_views WHERE created_at >= CURRENT_DATE",
+        "refId": "A", "format": "table"
+      }]
+    },
+    {
+      "type": "stat",
+      "title": "Contacts (All Time)",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "targets": [{
+        "rawSql": "SELECT COUNT(*) FROM contact_submissions",
+        "refId": "A", "format": "table"
+      }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "steps": [{"color": "orange", "value": null}, {"color": "green", "value": 5}] } } }
+    },
+    {
+      "type": "stat",
+      "title": "Waitlist (All Time)",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "targets": [{
+        "rawSql": "SELECT COUNT(*) FROM waitlist_entries",
+        "refId": "A", "format": "table"
+      }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Daily Traffic — Visitors & Sessions",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 },
+      "targets": [{
+        "rawSql": "SELECT day as time, unique_visitors, sessions FROM v_daily_traffic WHERE day >= $__timeFrom()::date ORDER BY day",
+        "refId": "A", "format": "table"
+      }],
+      "fieldConfig": { "defaults": { "custom": { "fillOpacity": 15 } } }
+    },
+    {
+      "type": "piechart",
+      "title": "Traffic Sources",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 5 },
+      "targets": [{
+        "rawSql": "SELECT source, SUM(unique_visitors) as visitors FROM v_traffic_by_source WHERE day >= $__timeFrom()::date GROUP BY source ORDER BY visitors DESC LIMIT 10",
+        "refId": "A", "format": "table"
+      }]
+    },
+    {
+      "type": "table",
+      "title": "Top Pages",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 5 },
+      "targets": [{
+        "rawSql": "SELECT path, SUM(views) as views, SUM(unique_visitors) as visitors FROM v_top_pages WHERE day >= $__timeFrom()::date GROUP BY path ORDER BY views DESC LIMIT 15",
+        "refId": "A", "format": "table"
+      }]
+    },
+    {
+      "type": "row",
+      "title": "⚡ ACTIVATION — Do visitors experience the aha moment?",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+      "collapsed": false
+    },
+    {
+      "type": "timeseries",
+      "title": "Daily Funnel: Visitors → CTA Clicks → Contacts → Waitlist",
+      "gridPos": { "h": 8, "w": 16, "x": 0, "y": 14 },
+      "targets": [{
+        "rawSql": "SELECT day as time, visitors, cta_clicks, contact_submissions, waitlist_joins FROM v_daily_funnel WHERE day >= $__timeFrom()::date ORDER BY day",
+        "refId": "A", "format": "table"
+      }],
+      "fieldConfig": { "defaults": { "custom": { "fillOpacity": 10 } } }
+    },
+    {
+      "type": "gauge",
+      "title": "CTA Click Rate %",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 14 },
+      "targets": [{
+        "rawSql": "SELECT ROUND(COUNT(DISTINCT CASE WHEN e.event_name = 'cta_click' THEN e.visitor_id END)::numeric / NULLIF(COUNT(DISTINCT pv.visitor_id), 0) * 100, 1) FROM analytics_page_views pv LEFT JOIN analytics_events e ON pv.visitor_id = e.visitor_id AND e.created_at >= $__timeFrom() WHERE pv.created_at >= $__timeFrom()",
+        "refId": "A", "format": "table"
+      }],
+      "fieldConfig": { "defaults": { "min": 0, "max": 100, "thresholds": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 2}, {"color": "green", "value": 5}] } } }
+    },
+    {
+      "type": "gauge",
+      "title": "Contact Rate %",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 14 },
+      "targets": [{
+        "rawSql": "SELECT ROUND(COUNT(*)::numeric / NULLIF((SELECT COUNT(DISTINCT visitor_id) FROM analytics_page_views WHERE created_at >= $__timeFrom()), 0) * 100, 2) FROM contact_submissions WHERE created_at >= $__timeFrom()",
+        "refId": "A", "format": "table"
+      }],
+      "fieldConfig": { "defaults": { "min": 0, "max": 100, "thresholds": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 1}, {"color": "green", "value": 3}] } } }
+    },
+    {
+      "type": "bargauge",
+      "title": "Events by Category (AARRR)",
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 18 },
+      "targets": [{
+        "rawSql": "SELECT event_category, COUNT(*) as events FROM analytics_events WHERE created_at >= $__timeFrom() GROUP BY event_category ORDER BY events DESC",
+        "refId": "A", "format": "table"
+      }]
+    },
+    {
+      "type": "row",
+      "title": "🔄 RETENTION — Do visitors come back?",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+      "collapsed": false
+    },
+    {
+      "type": "heatmap",
+      "title": "Weekly Retention Cohorts",
+      "description": "Rows = cohort signup week, Columns = weeks since first visit, Color = # returning visitors",
+      "gridPos": { "h": 8, "w": 16, "x": 0, "y": 23 },
+      "targets": [{
+        "rawSql": "SELECT cohort_week as time, weeks_since_first, returning_visitors FROM v_weekly_retention WHERE cohort_week >= $__timeFrom()::date ORDER BY cohort_week, weeks_since_first",
+        "refId": "A", "format": "table"
+      }]
+    },
+    {
+      "type": "stat",
+      "title": "Returning Visitor Rate %",
+      "description": "% of today's visitors who have visited before",
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 23 },
+      "targets": [{
+        "rawSql": "WITH today_visitors AS (SELECT DISTINCT visitor_id FROM analytics_page_views WHERE created_at >= CURRENT_DATE), returning AS (SELECT tv.visitor_id FROM today_visitors tv WHERE EXISTS (SELECT 1 FROM analytics_page_views pv WHERE pv.visitor_id = tv.visitor_id AND pv.created_at < CURRENT_DATE)) SELECT ROUND(COUNT(*)::numeric / NULLIF((SELECT COUNT(*) FROM today_visitors), 0) * 100, 1) FROM returning",
+        "refId": "A", "format": "table"
+      }],
+      "fieldConfig": { "defaults": { "thresholds": { "steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 15}, {"color": "green", "value": 30}] } } }
+    },
+    {
+      "type": "stat",
+      "title": "Blog Re-reads",
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 27 },
+      "targets": [{
+        "rawSql": "SELECT COUNT(*) FROM analytics_events WHERE event_name = 'blog_read' AND created_at >= $__timeFrom()",
+        "refId": "A", "format": "table"
+      }]
+    },
+    {
+      "type": "row",
+      "title": "🧪 EXPERIMENTS — Lean Startup Hypotheses",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 },
+      "collapsed": false
+    },
+    {
+      "type": "table",
+      "title": "Active Experiments",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 32 },
+      "targets": [{
+        "rawSql": "SELECT name, hypothesis, metric_name, baseline_value, target_value, current_value, status, started_at, CASE WHEN target_value IS NOT NULL AND current_value IS NOT NULL AND target_value != 0 THEN ROUND(current_value / target_value * 100, 1) ELSE NULL END as progress_pct FROM experiments ORDER BY CASE status WHEN 'active' THEN 0 WHEN 'validated' THEN 1 WHEN 'invalidated' THEN 2 ELSE 3 END, started_at DESC",
+        "refId": "A", "format": "table"
+      }],
+      "fieldConfig": {
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "status" }, "properties": [{ "id": "custom.cellOptions", "value": { "type": "color-text" } }, { "id": "mappings", "value": [{ "options": { "validated": { "color": "green", "text": "✅ Validated" }, "invalidated": { "color": "red", "text": "❌ Invalidated" }, "active": { "color": "blue", "text": "🔬 Active" }, "paused": { "color": "gray", "text": "⏸ Paused" } }, "type": "value" }] }] }
+        ]
+      }
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["terroir", "aarrr", "lean-startup"],
+  "templating": { "list": [] },
+  "time": { "from": "now-30d", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "🏴‍☠️ AARRR Pirate Metrics — Terroir AI",
+  "uid": "terroir-aarrr",
+  "version": 1
+}

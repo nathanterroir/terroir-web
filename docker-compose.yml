@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: terroir
+      POSTGRES_PASSWORD: terroir_dev_2024
+      POSTGRES_DB: terroir_ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U terroir"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  grafana:
+    build: ./grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_DATASOURCE_HOST: postgres
+      GF_DATASOURCE_USER: terroir
+      GF_DATASOURCE_PASSWORD: terroir_dev_2024
+      GF_DATABASE_TYPE: postgres
+      GF_DATABASE_HOST: postgres:5432
+      GF_DATABASE_NAME: terroir_ai
+      GF_DATABASE_USER: terroir
+      GF_DATABASE_PASSWORD: terroir_dev_2024
+      GF_DATABASE_SSL_MODE: disable
+      GF_SERVER_ROOT_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
