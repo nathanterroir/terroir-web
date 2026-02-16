@@ -119,10 +119,15 @@ resource "google_sql_database_instance" "main" {
     edition           = "ENTERPRISE"  # Standard edition (Enterprise Plus costs more)
 
     ip_configuration {
-      # COST SAVE: ~$3.60/mo by disabling public IP.
       # Cloud Run connects via built-in Cloud SQL Auth Proxy (Unix socket volume mount).
-      # No networking charges, no public IP idle charges.
-      ipv4_enabled = false
+      # Public IP is required when no VPC/private IP is configured.
+      ipv4_enabled    = true
+      require_ssl     = false
+
+      authorized_networks {
+        name  = "allow-all"
+        value = "0.0.0.0/0"
+      }
     }
 
     backup_configuration {
@@ -173,7 +178,20 @@ resource "google_secret_manager_secret" "db_url" {
 
 resource "google_secret_manager_secret_version" "db_url" {
   secret      = google_secret_manager_secret.db_url.id
-  secret_data = "postgres://terroir:${var.db_password}@/${google_sql_database.app.name}?host=/cloudsql/${google_sql_database_instance.main.connection_name}"
+  secret_data = "postgres://terroir:${var.db_password}@localhost/${google_sql_database.app.name}?host=/cloudsql/${google_sql_database_instance.main.connection_name}"
+}
+
+resource "google_secret_manager_secret" "db_password" {
+  secret_id = "db-password"
+  replication {
+    auto {}
+  }
+  depends_on = [google_project_service.apis]
+}
+
+resource "google_secret_manager_secret_version" "db_password" {
+  secret      = google_secret_manager_secret.db_password.id
+  secret_data = var.db_password
 }
 
 # ─── Cloud Run — Backend ────────────────────────
@@ -219,13 +237,18 @@ resource "google_cloud_run_v2_service" "backend" {
         cpu_idle = true # CPU only billed while processing requests, not between them.
       }
 
+      volume_mounts {
+        name       = "cloudsql"
+        mount_path = "/cloudsql"
+      }
+
       startup_probe {
         http_get {
           path = "/api/v1/health"
         }
         initial_delay_seconds = 0 # Rust starts in <1s
         period_seconds        = 3
-        failure_threshold     = 5
+        failure_threshold     = 10
       }
     }
 
@@ -244,7 +267,7 @@ resource "google_cloud_run_v2_service" "backend" {
     timeout = "30s" # Kill slow requests to prevent billing runaway
   }
 
-  depends_on = [google_project_service.apis]
+  depends_on = [google_project_service.apis, google_secret_manager_secret_version.db_url]
 }
 
 # ─── Cloud Run — Frontend ───────────────────────
@@ -304,7 +327,11 @@ resource "google_cloud_run_v2_service" "grafana" {
       }
       env {
         name  = "GF_DATABASE_HOST"
-        value = "/cloudsql/${google_sql_database_instance.main.connection_name}"
+        value = google_sql_database_instance.main.public_ip_address
+      }
+      env {
+        name  = "GF_DATABASE_SSL_MODE"
+        value = "disable"
       }
       env {
         name  = "GF_DATABASE_NAME"
@@ -318,14 +345,14 @@ resource "google_cloud_run_v2_service" "grafana" {
         name = "GF_DATABASE_PASSWORD"
         value_source {
           secret_key_ref {
-            secret  = google_secret_manager_secret.db_url.secret_id
+            secret  = google_secret_manager_secret.db_password.secret_id
             version = "latest"
           }
         }
       }
       env {
         name  = "GF_DATASOURCE_HOST"
-        value = "/cloudsql/${google_sql_database_instance.main.connection_name}"
+        value = google_sql_database_instance.main.public_ip_address
       }
       env {
         name  = "GF_DATASOURCE_USER"
@@ -335,7 +362,7 @@ resource "google_cloud_run_v2_service" "grafana" {
         name = "GF_DATASOURCE_PASSWORD"
         value_source {
           secret_key_ref {
-            secret  = google_secret_manager_secret.db_url.secret_id
+            secret  = google_secret_manager_secret.db_password.secret_id
             version = "latest"
           }
         }
@@ -370,13 +397,6 @@ resource "google_cloud_run_v2_service" "grafana" {
     scaling {
       min_instance_count = 0
       max_instance_count = 1 # COST SAVE: Only you use Grafana. 1 instance max.
-    }
-
-    volumes {
-      name = "cloudsql"
-      cloud_sql_instance {
-        instances = [google_sql_database_instance.main.connection_name]
-      }
     }
 
     timeout = "60s"

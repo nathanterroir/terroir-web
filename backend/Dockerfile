@@ -7,7 +7,11 @@ RUN mkdir src && echo "fn main() {}" > src/main.rs && \
 RUN rm -rf src
 COPY src/ src/
 COPY migrations/ migrations/
-RUN cargo build --release --bin terroir-api
+COPY .sqlx/ .sqlx/
+ENV SQLX_OFFLINE=true
+# Remove the dummy binary so cargo is forced to recompile with real source
+RUN rm -f target/release/terroir-api target/release/deps/terroir_api* && \
+    cargo build --release --bin terroir-api
 
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*

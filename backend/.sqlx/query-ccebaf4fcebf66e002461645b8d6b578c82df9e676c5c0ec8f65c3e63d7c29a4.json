@@ -1,0 +1,56 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO waitlist_entries (id, email, name, company, interest)\n        VALUES ($1, $2, $3, $4, $5)\n        ON CONFLICT (email, interest) DO UPDATE SET name = EXCLUDED.name, company = EXCLUDED.company\n        RETURNING *\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "email",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "company",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "interest",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "ccebaf4fcebf66e002461645b8d6b578c82df9e676c5c0ec8f65c3e63d7c29a4"
+}

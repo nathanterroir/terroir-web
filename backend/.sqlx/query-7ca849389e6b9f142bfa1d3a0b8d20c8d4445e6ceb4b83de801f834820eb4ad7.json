@@ -1,0 +1,92 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT * FROM experiments ORDER BY created_at DESC",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "hypothesis",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "metric_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "baseline_value",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 5,
+        "name": "target_value",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 6,
+        "name": "current_value",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 7,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "started_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "ended_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "notes",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 12,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "7ca849389e6b9f142bfa1d3a0b8d20c8d4445e6ceb4b83de801f834820eb4ad7"
+}

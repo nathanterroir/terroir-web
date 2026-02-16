@@ -1,4 +1,4 @@
-FROM grafana/grafana:11.5-alpine
+FROM grafana/grafana:11.5.2
 
 # Copy provisioning configs
 COPY provisioning/ /etc/grafana/provisioning/
