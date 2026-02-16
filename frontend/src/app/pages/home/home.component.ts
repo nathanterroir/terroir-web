@@ -31,7 +31,7 @@ export class HomeComponent implements OnInit {
     this.seo.updateSeo({
       title: 'Terroir AI — Precision Labor Intelligence for Specialty Crops',
       description:
-        'Apply for the 2026 pilot program. iPhone-based computer vision that turns a single drive through your rows into a labor deployment plan — crew sizes, spray priorities, harvest logistics. Free for 20 farms.',
+        'Apply for the 2026 pilot program. iPhone-based computer vision that turns a single drive through your rows into a labor deployment plan — crew sizes, spray priorities, harvest logistics. Limited to 20 farms.',
       url: '/',
       image: 'https://images.unsplash.com/photo-1533038590840-1cde6e668a91?q=80&w=1200&auto=format&fit=crop',
     });

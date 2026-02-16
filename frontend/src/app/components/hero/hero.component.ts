@@ -35,7 +35,7 @@ import { AnalyticsService } from '@app/services/analytics.service';
         <div class="trust-bar">
           <span>On-device AI</span>
           <strong>&bull;</strong>
-          <span>No cloud uploads</span>
+          <span>Process offline, sync when ready</span>
           <strong>&bull;</strong>
           <span>Works offline</span>
           <strong>&bull;</strong>

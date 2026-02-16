@@ -111,7 +111,7 @@ export class SeoService {
           'sameAs': [],
           'contactPoint': {
             '@type': 'ContactPoint',
-            'email': 'hello@terroirai.com',
+            'email': 'support@terroirai.com',
             'contactType': 'sales',
           },
         },
@@ -125,7 +125,7 @@ export class SeoService {
             '@type': 'Offer',
             'price': '0',
             'priceCurrency': 'USD',
-            'description': 'Free trial available',
+            'description': 'Pilot program available — apply for early access',
           },
           'publisher': { '@id': `${this.baseUrl}/#organization` },
         },

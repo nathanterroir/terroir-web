@@ -29,7 +29,7 @@ import { AnalyticsService } from '@app/services/analytics.service';
           <div class="form-header">
             <span class="pilot-badge">2026 Pilot Program</span>
             <h3>Apply for early access</h3>
-            <p>20 farms. Free for pilot participants. No commitment.</p>
+            <p>Limited to 20 farms. Early adopter pricing for pilot participants.</p>
           </div>
           <div class="field-row">
             <div class="field">

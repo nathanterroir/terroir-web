@@ -25,8 +25,8 @@ import { Component } from '@angular/core';
                 <span class="stat-label">GPS accuracy</span>
               </div>
               <div class="stat">
-                <span class="stat-num">0</span>
-                <span class="stat-label">Cloud uploads</span>
+                <span class="stat-num">100%</span>
+                <span class="stat-label">Offline capable</span>
               </div>
             </div>
           </div>

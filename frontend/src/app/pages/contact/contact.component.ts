@@ -21,11 +21,7 @@ import { SeoService } from '@app/services/seo.service';
           <address class="info-items">
             <div class="info-item">
               <span class="info-label">Email</span>
-              <a href="mailto:hello&#64;terroirai.com">hello&#64;terroirai.com</a>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Based in</span>
-              <span>California, USA</span>
+              <a href="mailto:support&#64;terroirai.com">support&#64;terroirai.com</a>
             </div>
           </address>
         </div>

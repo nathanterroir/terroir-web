@@ -13,7 +13,7 @@ import { AnalyticsService } from '@app/services/analytics.service';
           <div class="cta-content">
             <span class="limited-badge">Limited Availability</span>
             <h2>2026 Pilot Program — 20 Farms Only</h2>
-            <p>Free early access to Precision Labor Intelligence. No commitment required.</p>
+            <p>Early access to Precision Labor Intelligence. Limited spots for the 2026 season.</p>
             <div class="cta-actions">
               <button class="btn btn-white" (click)="onReserveSpot()">Reserve Your Spot</button>
               <a routerLink="/contact" class="btn btn-ghost" (click)="onContact()">Questions? Talk to Us</a>
